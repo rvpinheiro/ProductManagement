@@ -1,0 +1,22 @@
+﻿@model ProductManagement.Models.Product
+
+@{
+    ViewBag.Title = "Eliminar Produto";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<h3>Tem certeza de que deseja eliminar este produto?</h3>
+<div>
+    <h4>@Model.Name</h4>
+    <p>
+        <strong>Descrição:</strong> @Model.Description<br />
+        <strong>Preço:</strong> @Model.Price.ToString("C")
+    </p>
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

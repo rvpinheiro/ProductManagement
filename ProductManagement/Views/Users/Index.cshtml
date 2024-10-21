@@ -3,42 +3,55 @@
 
 @{
     ViewBag.Title = "Lista de utilizadores";
-    var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Obtém o ID do utilizador logado
+    var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier); 
 }
 
-<h2>Lista de Usuários</h2>
+<h2 class="my-4 text-center">@ViewBag.Title</h2>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Email</th>
-            <th>Nome de utilizador</th>
-            <th>Papel</th>
-            <th>Ações</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var (User, IsAdmin) in Model)
-        {
-            <tr>
-                <td>@User.Email</td>
-                <td>@User.UserName</td>
-                <td>@(IsAdmin ? "Admin" : "Regular")</td>
-                <td>
-                    @if (User.Id != currentUserId) // Verifica se não é o utilizador logado
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Lista de utilizadores</h4>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Email</th>
+                        <th>Nome de utilizador</th>
+                        <th>Role</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var (User, IsAdmin) in Model)
                     {
-                        <form method="post" asp-action="ToggleAdminRole" asp-route-userId="@User.Id" asp-route-makeAdmin="@(!IsAdmin)">
-                            <button type="submit" class="btn @(IsAdmin ? "btn-danger" : "btn-success")">
-                                @(IsAdmin ? "Tornar Regular" : "Tornar Admin")
-                            </button>
-                        </form>
+                        <tr>
+                            <td>@User.Email</td>
+                            <td>@User.UserName</td>
+                            <td>@(IsAdmin ? "Admin" : "Regular")</td>
+                            <td>
+                                @if (User.Id != currentUserId) 
+                                {
+                                    <form method="post" asp-action="ToggleAdminRole" asp-route-userId="@User.Id" asp-route-makeAdmin="@(!IsAdmin)" style="display:inline;">
+                                        <button type="submit" class="btn @(IsAdmin ? "btn-danger" : "btn-success")">
+                                            @(IsAdmin ? "Tornar Regular" : "Tornar Admin")
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Não pode alterar a sua própria Role.</span>
+                                }
+                            </td>
+                        </tr>
                     }
-                    else
-                    {
-                        <span class="text-muted">Não pode alterar seu próprio papel.</span>
-                    }
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

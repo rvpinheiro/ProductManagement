@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ProductManagement.Data;
 using ProductManagement.Models;
-using System.Linq;
+using System.Threading.Tasks;
 
 namespace ProductManagement.Controllers
 {
@@ -14,10 +15,10 @@ namespace ProductManagement.Controllers
         {
             _context = context;
         }
-        
-        public IActionResult Index()
+
+        public async Task<IActionResult> Index()
         {
-            var products = _context.Products.ToList();
+            var products = await _context.Products.ToListAsync();
             return View(products);
         }
 
@@ -29,21 +30,22 @@ namespace ProductManagement.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public IActionResult Create(Product product)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Product product)
         {
             if (ModelState.IsValid)
             {
                 _context.Products.Add(product);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync(); 
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
         }
 
         [Authorize(Roles = "Admin")]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            var product = _context.Products.Find(id);
+            var product = await _context.Products.FindAsync(id); 
             if (product == null)
             {
                 return NotFound();
@@ -53,21 +55,22 @@ namespace ProductManagement.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public IActionResult Edit(Product product)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(Product product)
         {
             if (ModelState.IsValid)
             {
                 _context.Products.Update(product);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync(); 
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
         }
 
         [Authorize(Roles = "Admin")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var product = _context.Products.Find(id);
+            var product = await _context.Products.FindAsync(id); 
             if (product == null)
             {
                 return NotFound();
@@ -77,11 +80,15 @@ namespace ProductManagement.Controllers
 
         [HttpPost, ActionName("Delete")]
         [Authorize(Roles = "Admin")]
-        public IActionResult DeleteConfirmed(int id)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = _context.Products.Find(id);
-            _context.Products.Remove(product);
-            _context.SaveChanges();
+            var product = await _context.Products.FindAsync(id); 
+            if (product != null)
+            {
+                _context.Products.Remove(product);
+                await _context.SaveChangesAsync(); 
+            }
             return RedirectToAction(nameof(Index));
         }
     }
